@@ -1,5 +1,5 @@
-; �ļ���;��STM32F103������оƬ�����ļ�������ջ���쳣�����͸�λ��ڡ�
-; ��λ�����SystemInit����ʱ�ӣ��پ�C����ʱ����main��ͨ�����޸ġ�
+; 文件用途：STM32F103中容量芯片启动文件，定义栈、异常向量和复位入口。
+; 复位后进入SystemInit配置时钟，再经C运行时进入main；通常不修改。
 ;******************** (C) COPYRIGHT 2011 STMicroelectronics ********************
 ;* File Name          : startup_stm32f10x_md.s
 ;* Author             : MCD Application Team

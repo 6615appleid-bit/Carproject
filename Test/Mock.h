@@ -1,20 +1,31 @@
-/* ÎÄ¼şÓÃÍ¾£ºÄ£ÄâÄ£¿éµÄ²âÊÔ±äÁ¿ÉùÃ÷£ºÓÃÓÚ×¢Èë´«¸ĞÆ÷×´Ì¬¡¢¹Û²ìÖ¸ÁîºÍµ÷ÓÃ´ÎÊı£¬²»Á¬½ÓÕæÊµ´«¸ĞÆ÷¡£ */
+/* æ–‡ä»¶ç”¨é€”ï¼šæ¨¡æ‹Ÿæ¨¡å—çš„æµ‹è¯•å˜é‡å£°æ˜ï¼šç”¨äºæ³¨å…¥ä¼ æ„Ÿå™¨çŠ¶æ€ã€è§‚å¯ŸæŒ‡ä»¤å’Œè°ƒç”¨æ¬¡æ•°ï¼Œä¸è¿æ¥çœŸå®ä¼ æ„Ÿå™¨ã€‚ */
 #ifndef MOCK_H
 #define MOCK_H
 #include "Track.h"
 #include "Avoid.h"
 /* Debugger-editable inputs. Mock sampling treats each scheduled sense call as
  * one fresh simulated sample. Real drivers must check actual data freshness. */
-extern volatile TrackState mock_line_state; /* Ä£ÄâºìÍâ×´Ì¬£¬ÓÉ²âÊÔ»òµ÷ÊÔÆ÷ÉèÖÃ¡£ */
-extern volatile int16_t mock_line_error; /* Ä£ÄâºÚÏßÆ«²î£¬¸ºÊıÔÚ×ó£¬ÕıÊıÔÚÓÒ¡£ */
-extern volatile AvoidCheck mock_obstacle; /* Ä£Äâ²â¾à´¦Àí½á¹û£ºÎŞĞ§¡¢ÎŞÕÏ°­¡¢ÓĞÕÏ°­¡£ */
-extern volatile AvoidStatus mock_avoid_phase; /* Ä£Äâ±ÜÕÏµ±Ç°½×¶Î£¬¿ÉÓÉ²âÊÔÊÖ¶¯ÍÆ½ø¡£ */
-extern volatile uint8_t mock_start_ok; /* ÉèÎª0¿ÉÄ£Äâ±ÜÕÏÆô¶¯Ê§°Ü¡£ */
-extern volatile uint8_t mock_fail_on_update; /* ÉèÎª1¿ÉÄ£ÄâÖ´ĞĞ±ÜÕÏÊ±·¢Éú¹ÊÕÏ¡£ */
-extern volatile uint32_t mock_track_calls; /* ¼ÇÂ¼Ñ­¼£¿ØÖÆµ÷ÓÃ´ÎÊı£¬¼ì²éÊÇ·ñ±»´íÎóµ÷ÓÃ¡£ */
-extern volatile uint32_t mock_avoid_calls; /* ¼ÇÂ¼±ÜÕÏ¿ØÖÆµ÷ÓÃ´ÎÊı£¬¼ì²é¿ØÖÆÈ¨ÊÇ·ñ»¥³â¡£ */
-extern volatile int16_t mock_motor_left; /* ±£´æ×óÂÖÄ£ÄâĞèÇó£¬²»´ú±íÕæÊµ³µÂÖËÙ¶È¡£ */
-extern volatile int16_t mock_motor_right; /* ±£´æÓÒÂÖÄ£ÄâĞèÇó£¬²»´ú±íÕæÊµ³µÂÖËÙ¶È¡£ */
+extern volatile TrackState mock_line_state; /* æ¨¡æ‹Ÿçº¢å¤–çŠ¶æ€ï¼Œç”±æµ‹è¯•æˆ–è°ƒè¯•å™¨è®¾ç½®ã€‚ */
+extern volatile int16_t mock_line_error; /* æ¨¡æ‹Ÿé»‘çº¿åå·®ï¼Œè´Ÿæ•°åœ¨å·¦ï¼Œæ­£æ•°åœ¨å³ã€‚ */
+extern volatile AvoidCheck mock_obstacle; /* æ¨¡æ‹Ÿæµ‹è·å¤„ç†ç»“æœï¼šæ— æ•ˆã€æ— éšœç¢ã€æœ‰éšœç¢ã€‚ */
+extern volatile AvoidStatus mock_avoid_phase; /* æ¨¡æ‹Ÿé¿éšœå½“å‰é˜¶æ®µï¼Œå¯ç”±æµ‹è¯•æ‰‹åŠ¨æ¨è¿›ã€‚ */
+extern volatile uint8_t mock_start_ok; /* è®¾ä¸º0å¯æ¨¡æ‹Ÿé¿éšœå¯åŠ¨å¤±è´¥ã€‚ */
+extern volatile uint8_t mock_fail_on_update; /* è®¾ä¸º1å¯æ¨¡æ‹Ÿæ‰§è¡Œé¿éšœæ—¶å‘ç”Ÿæ•…éšœã€‚ */
+extern volatile uint32_t mock_track_calls; /* è®°å½•å¾ªè¿¹æ§åˆ¶è°ƒç”¨æ¬¡æ•°ï¼Œæ£€æŸ¥æ˜¯å¦è¢«é”™è¯¯è°ƒç”¨ã€‚ */
+extern volatile uint32_t mock_avoid_calls; /* è®°å½•é¿éšœæ§åˆ¶è°ƒç”¨æ¬¡æ•°ï¼Œæ£€æŸ¥æ§åˆ¶æƒæ˜¯å¦äº’æ–¥ã€‚ */
+/* å¾ªè¿¹/é¿éšœç°åœ¨åªè¾“å‡ºã€Œç›®æ ‡èˆªå‘è§’ + ç›®æ ‡é€Ÿåº¦ã€ï¼Œä¸å†™ç”µæœºï¼›æµ‹è¯•æ–­è¨€è¿™ä¸¤ä¸ªå€¼
+ * è¢« CarControl åŸæ ·è½¬äº¤ç»™äº†èˆªå‘ç¯ï¼ˆHeading_Driveï¼‰ã€‚ */
+extern volatile float   mock_track_steer;
+extern volatile int16_t mock_track_speed;
+/* ä¸¢çº¿æ—¶å¾ªè¿¹ç»™å‡ºçš„æœç´¢å‘½ä»¤ï¼ˆçœŸå®æ¨¡å—ä¼šæ²¿æœ€åä¸€æ¬¡çš„ä¿®æ­£æ–¹å‘ç»§ç»­è½¬ï¼‰ã€‚
+ * é»˜è®¤ 0/0 = æ›¿èº«ä¸æœç´¢ï¼Œä¹Ÿå°±æ˜¯ã€Œä¸¢çº¿å³åœè½¦ã€ï¼›æµ‹è¯•å¯ä»¥è®¾æˆéé›¶æ¥éªŒè¯
+ * æ•´è½¦åœ¨ä¸¢çº¿æœŸé—´ç…§å¸¸æŠŠå‘½ä»¤è½¬äº¤ç»™èˆªå‘ç¯ã€‚ */
+extern volatile float   mock_track_search_steer;
+extern volatile int16_t mock_track_search_speed;
+extern volatile float   mock_avoid_steer;
+extern volatile int16_t mock_avoid_speed;
+extern volatile int16_t mock_motor_left; /* ä¿å­˜å·¦è½®æ¨¡æ‹Ÿéœ€æ±‚ï¼Œä¸ä»£è¡¨çœŸå®è½¦è½®é€Ÿåº¦ã€‚ */
+extern volatile int16_t mock_motor_right; /* ä¿å­˜å³è½®æ¨¡æ‹Ÿéœ€æ±‚ï¼Œä¸ä»£è¡¨çœŸå®è½¦è½®é€Ÿåº¦ã€‚ */
 extern volatile uint8_t mock_done_on_update;
 extern volatile uint32_t mock_avoid_reset_calls;
 extern volatile uint32_t mock_track_reset_calls;

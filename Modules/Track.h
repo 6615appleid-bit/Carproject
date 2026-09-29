@@ -2,6 +2,7 @@
 #ifndef TRACK_H
 #define TRACK_H
 #include <stdint.h>
+#include "Heading.h" /* 转向统一走「目标航向角 + 目标速度」（DriveCmd） */
 
 typedef enum {
     /* 数据无效、丢线、稳定正常、宽黑区域候选、无法可靠判断；宽黑不等于终点。 */
@@ -26,12 +27,18 @@ TrackStatus Track_GetStatus(void);
  * Changes only when SenseUpdate consumes a new frame. Read status first;
  * an ID alone never implies valid data. CarControl need not inspect this. */
 uint32_t Track_GetSampleId(void);
-/* 执行一步循迹运动控制；只有整车处于正常循迹时才调用。 */
-void Track_Update(void); /* one control step; may control motors; no long delay.
- * TRACK_NORMAL and a single wide black group (TRACK_WIDE) both drive motors. */
-/* 清除控制器历史（如积分、上次误差），不写电机。
- * 保留感知结果、有效性及线路确认历史，避免交接后误报丢线。
- * 感知的初始化由Track_Init负责；数据新鲜度仍由SenseUpdate负责。
+/* 执行一步循迹运动控制；只有整车处于正常循迹时才调用。
+ * 只算出「目标航向角 + 目标速度」并存起来，【不写电机】—— 差速由 Heading 产生。
+ * 线路数据不可用时把目标速度置 0，是否停车由整车决定。 */
+void Track_Update(void); /* one control step; sets the steering command only.
+ * TRACK_NORMAL and a single wide black group (TRACK_WIDE) both produce a command.
+ * Motor writes belong to Heading: this module must never call Motor_*. */
+/* 读取本模块最新算出的转向命令；还没算过或刚 Reset 过时速度是 TRACK_SPEED_MIN。 */
+void Track_GetDrive(DriveCmd *out);
+/* 清除控制器历史（加航向基准、偏差微分、速度斜坡），不写电机。
+ * 保留感知结果、有效性及线路确认历史，避免交接后误报丢线；
+ * 下一拍 Track_Update 会重新把当前车头朝向当作航向基准。
+ * 感知的初始化由 Track_Init 负责；数据新鲜度仍由 SenseUpdate 负责。
  */
 void Track_Reset(void);
 #endif

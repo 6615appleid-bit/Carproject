@@ -1,23 +1,29 @@
-/* ÎÄ¼şÓÃÍ¾£ºÑ­¼£Ä£ÄâÊµÏÖ£ºÓÃ±äÁ¿´úÌæºìÍâÊäÈë£¬Ö»ÑéÖ¤½Ó¿ÚºÍĞ­µ÷Âß¼­£¬Ã»ÓĞÕæÕıµÄÑ­¼£PID¡£ */
+/* æ–‡ä»¶ç”¨é€”ï¼šå¾ªè¿¹æ¨¡æ‹Ÿå®ç°ï¼šç”¨å˜é‡ä»£æ›¿çº¢å¤–è¾“å…¥ï¼ŒåªéªŒè¯æ¥å£å’Œåè°ƒé€»è¾‘ï¼Œæ²¡æœ‰çœŸæ­£çš„å¾ªè¿¹PIDã€‚
+ * æ³¨æ„ï¼šè¿™é‡Œã€ä¸åŒ…å« Motor.hã€‘â€”â€” å¾ªè¿¹æ¨¡å—ä¸å†™ç”µæœºï¼Œå·®é€Ÿç”±èˆªå‘ç¯äº§ç”Ÿã€‚ */
 #include "Track.h"
-#include "Motor.h"
 #include "Mock.h"
-volatile TrackState mock_line_state; /* Ä£ÄâºìÍâ×´Ì¬£¬ÓÉ²âÊÔ»òµ÷ÊÔÆ÷ÉèÖÃ¡£ */
-volatile int16_t mock_line_error; /* Ä£ÄâºÚÏßÆ«²î£¬¸ºÊıÔÚ×ó£¬ÕıÊıÔÚÓÒ¡£ */
-volatile uint32_t mock_track_calls; /* ¼ÇÂ¼Ñ­¼£¿ØÖÆµ÷ÓÃ´ÎÊı£¬¼ì²éÊÇ·ñ±»´íÎóµ÷ÓÃ¡£ */
+volatile TrackState mock_line_state; /* æ¨¡æ‹Ÿçº¢å¤–çŠ¶æ€ï¼Œç”±æµ‹è¯•æˆ–è°ƒè¯•å™¨è®¾ç½®ã€‚ */
+volatile int16_t mock_line_error; /* æ¨¡æ‹Ÿé»‘çº¿åå·®ï¼Œè´Ÿæ•°åœ¨å·¦ï¼Œæ­£æ•°åœ¨å³ã€‚ */
+volatile uint32_t mock_track_calls; /* è®°å½•å¾ªè¿¹æ§åˆ¶è°ƒç”¨æ¬¡æ•°ï¼Œæ£€æŸ¥æ˜¯å¦è¢«é”™è¯¯è°ƒç”¨ã€‚ */
 volatile uint32_t mock_track_reset_calls;
 volatile uint32_t mock_track_history;
+volatile float   mock_track_steer; /* æ¨¡æ‹Ÿè¾“å‡ºçš„ç›®æ ‡èˆªå‘è§’ï¼ˆåº¦ï¼‰ï¼Œæ­£ = å·¦è½¬ã€‚ */
+volatile int16_t mock_track_speed; /* æ¨¡æ‹Ÿè¾“å‡ºçš„ç›®æ ‡é€Ÿåº¦ï¼ˆè®¡æ•°/10msï¼‰ã€‚ */
+volatile float   mock_track_search_steer; /* ä¸¢çº¿æ—¶çš„æœç´¢å‘½ä»¤ï¼Œé»˜è®¤ 0 = ä¸æœç´¢ã€‚ */
+volatile int16_t mock_track_search_speed;
 static uint32_t sample_id;
-static TrackStatus sample; /* Ä£ÄâÄ£¿é¶ÔÍâ·¢²¼µÄ´¦Àíºó×´Ì¬¡£ */
-static uint8_t stable_count; /* Á¬ĞøÕı³£µÄÄ£ÄâÑù±¾¼ÆÊı£¬´ïµ½3´Î²Å±¨¸æÕı³£¡£ */
+static TrackStatus sample; /* æ¨¡æ‹Ÿæ¨¡å—å¯¹å¤–å‘å¸ƒçš„å¤„ç†åçŠ¶æ€ã€‚ */
+static uint8_t stable_count; /* è¿ç»­æ­£å¸¸çš„æ¨¡æ‹Ÿæ ·æœ¬è®¡æ•°ï¼Œè¾¾åˆ°3æ¬¡æ‰æŠ¥å‘Šæ­£å¸¸ã€‚ */
 
-/* Ö»Çå³ı¿ØÖÆÀúÊ·£¬±£ÁôÒÑ¾­È·ÈÏµÄ¸ĞÖª½á¹û¡£ */
+/* åªæ¸…é™¤æ§åˆ¶å†å²ï¼Œä¿ç•™å·²ç»ç¡®è®¤çš„æ„ŸçŸ¥ç»“æœã€‚ */
 void Track_Reset(void)
 {
     ++mock_track_reset_calls;
     mock_track_history = 0U;
+    mock_track_steer = 0.0f;
+    mock_track_speed = 0;
 }
-/* ³õÊ¼»¯Ñ­¼£Ä£¿é£»Ä£Äâ°æ½«ÊäÈëÉèÎªÎŞĞ§£¬µÈ´ı²âÊÔ³ÌĞòÌá¹©Êı¾İ¡£ */
+/* åˆå§‹åŒ–å¾ªè¿¹æ¨¡å—ï¼›æ¨¡æ‹Ÿç‰ˆå°†è¾“å…¥è®¾ä¸ºæ— æ•ˆï¼Œç­‰å¾…æµ‹è¯•ç¨‹åºæä¾›æ•°æ®ã€‚ */
 void Track_Init(void)
 {
     mock_line_state = TRACK_INVALID;
@@ -30,27 +36,45 @@ void Track_Init(void)
     sample.error = 0;
     Track_Reset();
 }
-/* Î¬»¤ºìÍâ×´Ì¬¡¢ÓĞĞ§ĞÔºÍÎÈ¶¨ĞÔ£»²»¿ØÖÆµç»ú£¬±ÜÕÏÆÚ¼äÒ²Ó¦¼ÌĞøµ÷ÓÃ¡£ */
+/* ç»´æŠ¤çº¢å¤–çŠ¶æ€ã€æœ‰æ•ˆæ€§å’Œç¨³å®šæ€§ï¼›ä¸æ§åˆ¶ç”µæœºï¼Œé¿éšœæœŸé—´ä¹Ÿåº”ç»§ç»­è°ƒç”¨ã€‚ */
 void Track_SenseUpdate(void)
 {
     ++sample_id;
     sample.state = mock_line_state;
     sample.error = mock_line_error;
-    /* ÕâÀïÖ»Ä£ÄâÁ¬Ğø3¸öÑù±¾µÄÈ·ÈÏ£»ÕæÊµÄ£¿é±ØĞëÈ·±£ËüÃÇÊÇĞÂ²ÉÑù¡£ */
+    /* è¿™é‡Œåªæ¨¡æ‹Ÿè¿ç»­3ä¸ªæ ·æœ¬çš„ç¡®è®¤ï¼›çœŸå®æ¨¡å—å¿…é¡»ç¡®ä¿å®ƒä»¬æ˜¯æ–°é‡‡æ ·ã€‚ */
     if (sample.state == TRACK_NORMAL) {
         if (stable_count < 3U) ++stable_count;
         if (stable_count < 3U) sample.state = TRACK_AMBIGUOUS;
     } else stable_count = 0U;
 }
-/* ·µ»ØÒÑ´¦ÀíµÄÏß×´Ì¬ºÍÆ«²î£»ÕâÊÇ¶ÁÈ¡½á¹û£¬²»´ú±íÓÖ²ÉÑùÁËÒ»´Î¡£ */
+/* è¿”å›å·²å¤„ç†çš„çº¿çŠ¶æ€å’Œåå·®ï¼›è¿™æ˜¯è¯»å–ç»“æœï¼Œä¸ä»£è¡¨åˆé‡‡æ ·äº†ä¸€æ¬¡ã€‚ */
 TrackStatus Track_GetStatus(void) { return sample; }
-/* Ö´ĞĞÒ»²½Ñ­¼£ÔË¶¯¿ØÖÆ£»Ö»ÓĞÕû³µ´¦ÓÚÕı³£Ñ­¼£Ê±²Åµ÷ÓÃ¡£ */
+/* æ‰§è¡Œä¸€æ­¥å¾ªè¿¹è¿åŠ¨æ§åˆ¶ï¼›åªæœ‰æ•´è½¦å¤„äºæ­£å¸¸å¾ªè¿¹æ—¶æ‰è°ƒç”¨ã€‚
+ * åªäº§å‡ºã€Œç›®æ ‡èˆªå‘è§’ + ç›®æ ‡é€Ÿåº¦ã€ï¼Œã€ä¸å†™ç”µæœºã€‘â€”â€” å·®é€Ÿç”±èˆªå‘ç¯äº§ç”Ÿã€‚ */
 void Track_Update(void)
 {
     ++mock_track_calls;
     ++mock_track_history;
-    if (sample.state == TRACK_NORMAL) Motor_SetDemand(200, 200);
-    else Motor_Stop();
+    if (sample.state == TRACK_NORMAL) {
+        mock_track_steer = 12.5f;   /* å›ºå®šå¯è¾¨è®¤å€¼ï¼Œä¾¿äºæ–­è¨€è¢«åŸæ ·è½¬äº¤ */
+        mock_track_speed = 30;
+    } else if (sample.state == TRACK_WIDE) {
+        mock_track_steer = -8.0f;
+        mock_track_speed = 15;
+    } else {
+        /* ä¸¢çº¿/æ— æ³•åˆ¤æ–­ï¼šçœŸå®æ¨¡å—ä¼šæ²¿æœ€åä¸€æ¬¡çš„ä¿®æ­£æ–¹å‘ç»§ç»­è½¬å‘æœç´¢ï¼›
+         * æ›¿èº«é»˜è®¤ä¸æœç´¢ï¼ˆ0/0ï¼‰ï¼Œæµ‹è¯•å¯ä»¥ç”¨æœç´¢å‘½ä»¤é’©å­æ¨¡æ‹ŸçœŸå®è¡Œä¸ºã€‚ */
+        mock_track_steer = mock_track_search_steer;
+        mock_track_speed = mock_track_search_speed;
+    }
+}
+
+/* è¯»å–æœ¬æ¨¡å—æœ€æ–°ç®—å‡ºçš„è½¬å‘å‘½ä»¤ã€‚ */
+void Track_GetDrive(DriveCmd *out)
+{
+    out->steer_deg = mock_track_steer;
+    out->speed_cmd = mock_track_speed;
 }
 
 uint32_t Track_GetSampleId(void) { return sample_id; }

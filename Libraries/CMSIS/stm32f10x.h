@@ -1,5 +1,5 @@
-/* ÎÄ¼şÓÃÍ¾£ºĞ¾Æ¬¼Ä´æÆ÷¡¢ÍâÉèµØÖ·ÓëÆ÷¼şÀàĞÍ¶¨Òå£¬º¯ÊıÉùÃ÷Óë³£Á¿¶¨Òå¡£
- * Ô­³§¿âÎÄ¼ş£º¹©Çı¶¯²ãµ÷ÓÃ£¬Í¨³£ÎŞĞèÎªCarControlĞŞ¸Ä£»±£ÁôÒÔÏÂÔ­³§ËµÃ÷¡£
+/* æ–‡ä»¶ç”¨é€”ï¼šèŠ¯ç‰‡å¯„å­˜å™¨ã€å¤–è®¾åœ°å€ä¸å™¨ä»¶ç±»å‹å®šä¹‰ï¼Œå‡½æ•°å£°æ˜ä¸å¸¸é‡å®šä¹‰ã€‚
+ * åŸå‚åº“æ–‡ä»¶ï¼šä¾›é©±åŠ¨å±‚è°ƒç”¨ï¼Œé€šå¸¸æ— éœ€ä¸ºCarControlä¿®æ”¹ï¼›ä¿ç•™ä»¥ä¸‹åŸå‚è¯´æ˜ã€‚
  */
 /**
   ******************************************************************************
@@ -18,15 +18,15 @@
   *          is using in the C source code, usually in main.c. This file contains:
   *           - Configuration section that allows to select:
   *              - The device used in the target application
-  *              - To use or not the peripheral’s drivers in application code(i.e. 
-  *                code will be based on direct access to peripheral’s registers 
+  *              - To use or not the peripheralæŠ¯ drivers in application code(i.e. 
+  *                code will be based on direct access to peripheralæŠ¯ registers 
   *                rather than drivers API), this option is controlled by 
   *                "#define USE_STDPERIPH_DRIVER"
   *              - To change few application-specific parameters such as the HSE 
   *                crystal frequency
   *           - Data structures and the address mapping for all peripherals
   *           - Peripheral's registers declarations and bits definition
-  *           - Macros to access peripheral’s registers hardware
+  *           - Macros to access peripheralæŠ¯ registers hardware
   *
   ******************************************************************************
   * @attention

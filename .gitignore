@@ -3,14 +3,13 @@ MDK/*.uvguix.*
 MDK/*.uvoptx
 MDK/JLinkLog.txt
 
-# PlatformIO build output and local editor state
 .pio/
 .vscode/
 compile_commands.json
-
-# Local build and upload diagnostics
 *.log
 /axf_nm.txt
 /nm.txt
 /nm2.txt
 /sections.txt
+/upload*.log
+

@@ -1,21 +1,22 @@
-/* ÎÄ¼şÓÃÍ¾£º¼¯ÖĞÅäÖÃÕû³µµ÷¶ÈÖÜÆÚºÍ±ÜÕÏ³¬Ê±£»²ÎÊıĞèÒªÊµ³µ±ê¶¨¡£ */
+/* æ–‡ä»¶ç”¨é€”ï¼šé›†ä¸­é…ç½®æ•´è½¦è°ƒåº¦å‘¨æœŸå’Œé¿éšœè¶…æ—¶ï¼›å‚æ•°éœ€è¦å®è½¦æ ‡å®šã€‚ */
 #ifndef CAR_CONFIG_H
 #define CAR_CONFIG_H
-/* Maximum recovery window from the first unusable line reading.
- * LOST starts a low-speed search; INVALID stops immediately.
- * 0 disables recovery and faults on the first unusable reading. */
-#define CAR_TRACK_LOSS_TOLERANCE_MS 400U
-/* Open-loop PWM, not measured speed. Preserve the last steering direction;
- * both wheels stay forward and the outer wheel is capped at 300/1000. */
-#define CAR_TRACK_RECOVERY_DEMAND 200
-#define CAR_TRACK_RECOVERY_CORRECTION 100
-#if CAR_TRACK_RECOVERY_DEMAND <= 0 || CAR_TRACK_RECOVERY_CORRECTION < 0 || \
-    CAR_TRACK_RECOVERY_CORRECTION > CAR_TRACK_RECOVERY_DEMAND || \
-    CAR_TRACK_RECOVERY_DEMAND + CAR_TRACK_RECOVERY_CORRECTION > 1000
-#error Invalid line recovery motor demand
-#endif
+/* Line-loss tolerance: a single wide black group still counts as a usable line,
+ * and a lost or invalid reading only latches CAR_ERROR_TRACK after this long.
+ * ä¸¢çº¿æœŸé—´ä¸å†ç«‹åˆ»åœè½¦ï¼šTrack ä¼šæ²¿æœ€åä¸€æ¬¡çš„ä¿®æ­£æ–¹å‘ç»§ç»­è½¬å‘æ‰¾çº¿
+ * ï¼ˆTRACK_SEARCH_TIMEOUT_MS = 1000 msï¼Œè§ Hardware/track.cï¼‰ï¼Œ
+ * æ‰¾åˆ°çº¿å°±ç«‹åˆ»å›åˆ°æ­£å¸¸å¾ªè¿¹ï¼Œè¶…è¿‡ 1 ç§’æ²¡æ‰¾åˆ°æ‰åœæ­¢æœç´¢ã€‚
+ * æœ¬å€¼å¿…é¡»å¤§äº TRACK_SEARCH_TIMEOUT_MSï¼Œå¦åˆ™æœç´¢è¿˜æ²¡ç»“æŸå°±è¢«åˆ¤æ•…éšœã€‚
+ * 0 restores the old one-frame fail behaviour. */
+#define CAR_TRACK_LOSS_TOLERANCE_MS 1300U
 /* Provisional integration settings; calibrate on the actual vehicle. */
-#define CAR_CONTROL_PERIOD_MS 10U     //CarControlÃ¿¸ô10ºÁÃëÖ´ĞĞÒ»ÂÖ¿ØÖÆ
-#define CAR_AVOID_TIMEOUT_MS 12000U	 //´Ó¿ªÊ¼±ÜÕÏËãÆğ£¬ÈÆÕÏ¼ÓÕÒÏß³¬¹ı12Ãë¾Í¹ÊÕÏÍ£³µ
+#define CAR_CONTROL_PERIOD_MS 10U     //CarControlæ¯éš”10æ¯«ç§’æ‰§è¡Œä¸€è½®æ§åˆ¶
+#define CAR_AVOID_TIMEOUT_MS 12000U	 //ä»å¼€å§‹é¿éšœç®—èµ·ï¼Œç»•éšœåŠ æ‰¾çº¿è¶…è¿‡12ç§’å°±æ•…éšœåœè½¦
+/* Run-distance auto stop: when the odometer (left + right encoder counts
+ * accumulated since the current run started) reaches this value, the car
+ * stops and latches CAR_FINISHED. 0 disables the check.
+ * 100000 counted edges is a provisional value: convert it to a real distance
+ * with the measured counts-per-mm (see README, odometer calibration). */
+#define CAR_ODOMETER_STOP_COUNTS 100000
 #endif
-//Car_ctrl ¹ÜÀíµÄËùÓĞ²ÎÊı¼¯ÖĞ·ÅÔÚÒ»Æğ£¬·½±ãÒÔºóĞŞ¸Ä¡£
+//Car_ctrl ç®¡ç†çš„æ‰€æœ‰å‚æ•°é›†ä¸­æ”¾åœ¨ä¸€èµ·ï¼Œæ–¹ä¾¿ä»¥åä¿®æ”¹ã€‚

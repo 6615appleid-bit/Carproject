@@ -1,5 +1,8 @@
 /* Asynchronous dual ultrasound acquisition.
- * TIM4: free-running 1 MHz counter, CC1 interrupt ends the trigger pulse.
+ * TIM3: free-running 1 MHz counter, CC1 interrupt ends the trigger pulse.
+ * TIM4 is reserved for the right wheel encoder (PB6/PB7). This module only uses
+ * a timer as a time base with no pins at all, so the move changes nothing
+ * electrically: the trigger/echo pins PB10/PB11/PB0/PB1 stay where they were.
  * EXTI0/1: latch PB0/PB1 echo edges. No motor commands, Delay or busy waits.
  * Update is called by Avoid_SenseUpdate; getters only read cached samples.
  */
@@ -31,7 +34,7 @@ static void EchoEdge(uint8_t sensor)
     if (sensor != active_sensor || !initialized) return;
     if ((uint32_t)(Platform_GetMs() - started_ms) >= ECHO_TIMEOUT_MS) return;
     high = GPIO_ReadInputDataBit(GPIOB, echo_pin[sensor]);
-    counter = TIM_GetCounter(TIM4);
+    counter = TIM_GetCounter(TIM3);
     if (capture_state == CAP_RISE && high) {
         rise_us = counter;
         capture_state = CAP_FALL;
@@ -58,11 +61,11 @@ void EXTI1_IRQHandler(void)
     }
 }
 
-void TIM4_IRQHandler(void)
+void TIM3_IRQHandler(void)
 {
-    if (TIM_GetITStatus(TIM4, TIM_IT_CC1) != RESET) {
-        TIM_ClearITPendingBit(TIM4, TIM_IT_CC1);
-        TIM_ITConfig(TIM4, TIM_IT_CC1, DISABLE);
+    if (TIM_GetITStatus(TIM3, TIM_IT_CC1) != RESET) {
+        TIM_ClearITPendingBit(TIM3, TIM_IT_CC1);
+        TIM_ITConfig(TIM3, TIM_IT_CC1, DISABLE);
         GPIO_ResetBits(GPIOB, GPIO_Pin_10 | GPIO_Pin_11);
     }
 }
@@ -85,8 +88,8 @@ void Ultrasound_Init(void)
     distance_cm[0] = distance_cm[1] = ULTRASOUND_DISTANCE_INVALID;
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-    TIM_DeInit(TIM4);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+    TIM_DeInit(TIM3);
     GPIO_ResetBits(GPIOB, GPIO_Pin_10 | GPIO_Pin_11);
     GPIO_StructInit(&gpio);
     gpio.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
@@ -107,13 +110,13 @@ void Ultrasound_Init(void)
     TIM_TimeBaseStructInit(&timer);
     timer.TIM_Prescaler = (uint16_t)(timer_hz / 1000000U - 1U);
     timer.TIM_Period = 65535U;
-    TIM_TimeBaseInit(TIM4, &timer);
+    TIM_TimeBaseInit(TIM3, &timer);
     TIM_OCStructInit(&compare);
     compare.TIM_OCMode = TIM_OCMode_Timing;
-    TIM_OC1Init(TIM4, &compare);
-    TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Disable);
-    TIM_ClearITPendingBit(TIM4, TIM_IT_CC1);
-    TIM_Cmd(TIM4, ENABLE);
+    TIM_OC1Init(TIM3, &compare);
+    TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Disable);
+    TIM_ClearITPendingBit(TIM3, TIM_IT_CC1);
+    TIM_Cmd(TIM3, ENABLE);
 
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource0);
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource1);
@@ -128,7 +131,7 @@ void Ultrasound_Init(void)
     nvic.NVIC_IRQChannelPreemptionPriority = 1U;
     nvic.NVIC_IRQChannelSubPriority = 0U;
     nvic.NVIC_IRQChannelCmd = ENABLE;
-    nvic.NVIC_IRQChannel = TIM4_IRQn; NVIC_Init(&nvic);
+    nvic.NVIC_IRQChannel = TIM3_IRQn; NVIC_Init(&nvic);
     nvic.NVIC_IRQChannel = EXTI0_IRQn; NVIC_Init(&nvic);
     nvic.NVIC_IRQChannel = EXTI1_IRQn; NVIC_Init(&nvic);
     initialized = 1U;
@@ -158,7 +161,7 @@ void Ultrasound_Update(void)
             sample_ms[sensor] = finished_state == CAP_DONE ? completed_ms : now;
             have_sample[sensor] = 1U;
             capture_state = CAP_IDLE;
-            TIM_ITConfig(TIM4, TIM_IT_CC1, DISABLE);
+            TIM_ITConfig(TIM3, TIM_IT_CC1, DISABLE);
             GPIO_ResetBits(GPIOB, GPIO_Pin_10 | GPIO_Pin_11);
             next_sensor = (uint8_t)(sensor ^ 1U);
             finished_ms = now;
@@ -187,9 +190,9 @@ void Ultrasound_Update(void)
     capture_state = CAP_RISE;
     EXTI_ClearITPendingBit(EXTI_Line0 | EXTI_Line1);
     GPIO_SetBits(GPIOB, trig_pin[sensor]);
-    TIM_ClearITPendingBit(TIM4, TIM_IT_CC1);
-    TIM_SetCompare1(TIM4, (uint16_t)(TIM_GetCounter(TIM4) + TRIGGER_US));
-    TIM_ITConfig(TIM4, TIM_IT_CC1, ENABLE);
+    TIM_ClearITPendingBit(TIM3, TIM_IT_CC1);
+    TIM_SetCompare1(TIM3, (uint16_t)(TIM_GetCounter(TIM3) + TRIGGER_US));
+    TIM_ITConfig(TIM3, TIM_IT_CC1, ENABLE);
     __set_PRIMASK(saved_irq);
 }
 

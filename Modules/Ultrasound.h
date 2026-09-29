@@ -15,7 +15,9 @@ typedef struct {
 } UltrasoundSample;
 
 /* Left trigger PB10 / echo PB0; right trigger PB11 / echo PB1.
- * Owns TIM4, EXTI0 and EXTI1. SysTick remains owned by Platform.
+ * Owns TIM3, EXTI0 and EXTI1. SysTick remains owned by Platform.
+ * TIM4 is owned by the right wheel encoder, so this module must not use it;
+ * the timer here is a bare time base and has no pins on the outside.
  * Init/Update/getters run in main context; ISRs only capture pulse timing. */
 void Ultrasound_Init(void);
 void Ultrasound_Update(void); /* Nonblocking; call regularly (10 ms). */

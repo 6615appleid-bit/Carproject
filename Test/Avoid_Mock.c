@@ -1,15 +1,16 @@
-/* ÎÄ¼şÓÃÍ¾£º±ÜÕÏÄ£ÄâÊµÏÖ£º²âÊÔ³ÌĞòÊÖ¶¯ÉèÖÃ½×¶Î£¬Ã»ÓĞÊµ¼Ê²â¾à¡¢ÈÆĞĞÂ·¾¶»òÕÒÏßËã·¨¡£ */
+/* æ–‡ä»¶ç”¨é€”ï¼šé¿éšœæ¨¡æ‹Ÿå®ç°ï¼šæµ‹è¯•ç¨‹åºæ‰‹åŠ¨è®¾ç½®é˜¶æ®µï¼Œæ²¡æœ‰å®é™…æµ‹è·ã€ç»•è¡Œè·¯å¾„æˆ–æ‰¾çº¿ç®—æ³•ã€‚ */
 #include "Avoid.h"
 #include "Mock.h"
-#include "Motor.h"
-volatile AvoidCheck mock_obstacle; /* Ä£Äâ²â¾à´¦Àí½á¹û£ºÎŞĞ§¡¢ÎŞÕÏ°­¡¢ÓĞÕÏ°­¡£ */
-volatile AvoidStatus mock_avoid_phase; /* Ä£Äâ±ÜÕÏµ±Ç°½×¶Î£¬¿ÉÓÉ²âÊÔÊÖ¶¯ÍÆ½ø¡£ */
-volatile uint8_t mock_start_ok; /* ÉèÎª0¿ÉÄ£Äâ±ÜÕÏÆô¶¯Ê§°Ü¡£ */
-volatile uint8_t mock_fail_on_update; /* ÉèÎª1¿ÉÄ£ÄâÖ´ĞĞ±ÜÕÏÊ±·¢Éú¹ÊÕÏ¡£ */
+volatile AvoidCheck mock_obstacle; /* æ¨¡æ‹Ÿæµ‹è·å¤„ç†ç»“æœï¼šæ— æ•ˆã€æ— éšœç¢ã€æœ‰éšœç¢ã€‚ */
+volatile AvoidStatus mock_avoid_phase; /* æ¨¡æ‹Ÿé¿éšœå½“å‰é˜¶æ®µï¼Œå¯ç”±æµ‹è¯•æ‰‹åŠ¨æ¨è¿›ã€‚ */
+volatile uint8_t mock_start_ok; /* è®¾ä¸º0å¯æ¨¡æ‹Ÿé¿éšœå¯åŠ¨å¤±è´¥ã€‚ */
+volatile uint8_t mock_fail_on_update; /* è®¾ä¸º1å¯æ¨¡æ‹Ÿæ‰§è¡Œé¿éšœæ—¶å‘ç”Ÿæ•…éšœã€‚ */
 volatile uint8_t mock_done_on_update;
 volatile uint32_t mock_avoid_reset_calls;
-volatile uint32_t mock_avoid_calls; /* ¼ÇÂ¼±ÜÕÏ¿ØÖÆµ÷ÓÃ´ÎÊı£¬¼ì²é¿ØÖÆÈ¨ÊÇ·ñ»¥³â¡£ */
-/* ³õÊ¼»¯±ÜÕÏÄ£¿éºÍÄÚ²¿×´Ì¬¡£ */
+volatile uint32_t mock_avoid_calls; /* è®°å½•é¿éšœæ§åˆ¶è°ƒç”¨æ¬¡æ•°ï¼Œæ£€æŸ¥æ§åˆ¶æƒæ˜¯å¦äº’æ–¥ã€‚ */
+volatile float   mock_avoid_steer; /* æ¨¡æ‹Ÿè¾“å‡ºçš„ç›®æ ‡èˆªå‘è§’ï¼ˆåº¦ï¼‰ï¼Œæ­£ = å·¦è½¬ã€‚ */
+volatile int16_t mock_avoid_speed; /* æ¨¡æ‹Ÿè¾“å‡ºçš„ç›®æ ‡é€Ÿåº¦ï¼ˆè®¡æ•°/10msï¼‰ã€‚ */
+/* åˆå§‹åŒ–é¿éšœæ¨¡å—å’Œå†…éƒ¨çŠ¶æ€ã€‚ */
 void Avoid_Init(void)
 {
     mock_obstacle = AVOID_CHECK_INVALID;
@@ -20,32 +21,48 @@ void Avoid_Init(void)
     mock_avoid_reset_calls = 0U;
     Avoid_Reset();
 }
-/* ½áÊø»òÈ¡Ïû±¾´Î±ÜÕÏ²¢»Øµ½¿ÕÏĞ£»²»¿ØÖÆµç»ú£¬Í£³µÓÉÉÏ²ã¸ºÔğ¡£ */
-void Avoid_Reset(void) { ++mock_avoid_reset_calls; mock_avoid_phase = AVOID_IDLE; }
-/* Î¬»¤²â¾àºÍÕÏ°­¼ì²â×´Ì¬£¬²»¿ØÖÆµç»ú£»ÕæÊµÄ£¿éÄÚ²¿¹ÜÀí²ÉÑùÖÜÆÚÓëÓĞĞ§ĞÔ¡£ */
+/* ç»“æŸæˆ–å–æ¶ˆæœ¬æ¬¡é¿éšœå¹¶å›åˆ°ç©ºé—²ï¼›ä¸æ§åˆ¶ç”µæœºï¼Œåœè½¦ç”±ä¸Šå±‚è´Ÿè´£ã€‚ */
+void Avoid_Reset(void)
+{
+    ++mock_avoid_reset_calls;
+    mock_avoid_phase = AVOID_IDLE;
+    mock_avoid_steer = 0.0f;
+    mock_avoid_speed = 0;
+}
+/* ç»´æŠ¤æµ‹è·å’Œéšœç¢æ£€æµ‹çŠ¶æ€ï¼Œä¸æ§åˆ¶ç”µæœºï¼›çœŸå®æ¨¡å—å†…éƒ¨ç®¡ç†é‡‡æ ·å‘¨æœŸä¸æœ‰æ•ˆæ€§ã€‚ */
 void Avoid_SenseUpdate(void) { /* controlled by test/debugger */ }
-/* ¶ÁÈ¡ÕÏ°­ÅĞ¶Ï£ºÎŞĞ§¡¢ÎŞÕÏ°­»òÓĞÕÏ°­£»²»Æô¶¯±ÜÕÏ£¬Ò²²»¿ØÖÆµç»ú¡£ */
+/* è¯»å–éšœç¢åˆ¤æ–­ï¼šæ— æ•ˆã€æ— éšœç¢æˆ–æœ‰éšœç¢ï¼›ä¸å¯åŠ¨é¿éšœï¼Œä¹Ÿä¸æ§åˆ¶ç”µæœºã€‚ */
 AvoidCheck Avoid_Check(void) { return mock_obstacle; }
-/* ¿ªÊ¼Ò»´Î±ÜÕÏ²¢½øÈëÈÆĞĞ½×¶Î£»·µ»Ø·ÇÁã±íÊ¾³É¹¦£¬±¾º¯Êı²»Ö±½ÓÇı¶¯µç»ú¡£ */
+/* å¼€å§‹ä¸€æ¬¡é¿éšœå¹¶è¿›å…¥ç»•è¡Œé˜¶æ®µï¼›è¿”å›éé›¶è¡¨ç¤ºæˆåŠŸï¼Œæœ¬å‡½æ•°ä¸ç›´æ¥é©±åŠ¨ç”µæœºã€‚ */
 uint8_t Avoid_Start(void)
 {
     if (!mock_start_ok) return 0U;
     mock_avoid_phase = AVOID_BYPASSING;
     return 1U;
 }
-/* Ö´ĞĞÒ»²½±ÜÕÏ»òÕÒÏß£»lineÖ¸Ïò±¾ÂÖºÚÏß×´Ì¬£¬Ö»¶ÁÈ¡£¬²»ĞŞ¸Ä£»±¾º¯Êı¿ÉÒÔ¿ØÖÆµç»ú¡£ */
+/* æ‰§è¡Œä¸€æ­¥é¿éšœæˆ–æ‰¾çº¿ï¼›lineæŒ‡å‘æœ¬è½®é»‘çº¿çŠ¶æ€ï¼Œåªè¯»å–ï¼Œä¸ä¿®æ”¹ã€‚
+ * åªäº§å‡ºã€Œç›®æ ‡èˆªå‘è§’ + ç›®æ ‡é€Ÿåº¦ã€ï¼Œã€ä¸å†™ç”µæœºã€‘â€”â€” å·®é€Ÿç”±èˆªå‘ç¯äº§ç”Ÿã€‚ */
 void Avoid_Update(const TrackStatus *line)
 {
-    (void)line; /* real module may use state/error to guide search */ /* Ä£Äâ°æÔİ²»Ê¹ÓÃºÚÏß²ÎÊı£»ÕæÊµ±ÜÕÏ¿ÉÒÔ¾İ´Ëµ÷ÕûÕÒÏß¶¯×÷¡£ */
+    (void)line; /* æ¨¡æ‹Ÿç‰ˆæš‚ä¸ä½¿ç”¨é»‘çº¿å‚æ•°ï¼›çœŸå®é¿éšœä¼šæ®æ­¤è°ƒæ•´æ‰¾çº¿åŠ¨ä½œã€‚ */
     ++mock_avoid_calls;
-    if (mock_avoid_phase == AVOID_DONE) return; /* Íê³É×´Ì¬Ëø´æ£¬²»ÔÙÔË¶¯¡£ */
-    /* ¹ÊÕÏ×¢Èë·ÖÖ§£ºÓÃÓÚÑéÖ¤CarControlÄÜ·¢ÏÖÄ£¿éÊ§°Ü²¢Ëø¶¨Í£³µ¡£ */
+    if (mock_avoid_phase == AVOID_DONE) return; /* å®ŒæˆçŠ¶æ€é”å­˜ï¼Œä¸å†è¿åŠ¨ã€‚ */
+    /* æ•…éšœæ³¨å…¥åˆ†æ”¯ï¼šç”¨äºéªŒè¯CarControlèƒ½å‘ç°æ¨¡å—å¤±è´¥å¹¶é”å®šåœè½¦ã€‚ */
     if (mock_fail_on_update) {
-        mock_avoid_phase = AVOID_FAILED;
-        Motor_Stop();
+        mock_avoid_phase = AVOID_FAILED; /* åœè½¦ç”±CarControlè´Ÿè´£ */
     } else if (mock_done_on_update && mock_avoid_phase == AVOID_SEARCHING) {
-        mock_avoid_phase = AVOID_DONE; /* Ä£Äâ¸ºÔğÈËÒÑÍê³ÉÎÈ¶¨»ØÏßÅĞ¶Ï¡£ */
-    } else Motor_SetDemand(180, 80);
+        mock_avoid_phase = AVOID_DONE; /* æ¨¡æ‹Ÿè´Ÿè´£äººå·²å®Œæˆç¨³å®šå›çº¿åˆ¤æ–­ã€‚ */
+        mock_avoid_speed = 0;
+    } else {
+        mock_avoid_steer = -30.0f; /* å›ºå®šå¯è¾¨è®¤å€¼ */
+        mock_avoid_speed = 20;
+    }
 }
-/* ¶ÁÈ¡×´Ì¬²»»áÇå³ıDONE¡£ */
+/* è¯»å–æœ¬æ¨¡å—æœ€æ–°ç®—å‡ºçš„è½¬å‘å‘½ä»¤ã€‚ */
+void Avoid_GetDrive(DriveCmd *out)
+{
+    out->steer_deg = mock_avoid_steer;
+    out->speed_cmd = mock_avoid_speed;
+}
+/* è¯»å–çŠ¶æ€ä¸ä¼šæ¸…é™¤DONEã€‚ */
 AvoidStatus Avoid_GetStatus(void) { return mock_avoid_phase; }

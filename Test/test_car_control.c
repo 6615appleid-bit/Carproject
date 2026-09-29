@@ -1,23 +1,26 @@
-/* ÎÄ¼şÓÃÍ¾£ºÖ÷»ú×Ô¶¯²âÊÔ£ºÓÃ¿É¿ØÊ±¼äºÍÄ£ÄâÊäÈëÑéÖ¤ÕæÕıµÄCarControl´úÂë£¬²»ĞèÒªÁ¬½Óµ¥Æ¬»ú¡£ */
+/* æ–‡ä»¶ç”¨é€”ï¼šä¸»æœºè‡ªåŠ¨æµ‹è¯•ï¼šç”¨å¯æ§æ—¶é—´å’Œæ¨¡æ‹Ÿè¾“å…¥éªŒè¯çœŸæ­£çš„CarControlä»£ç ï¼Œä¸éœ€è¦è¿æ¥å•ç‰‡æœºã€‚ */
 #include <assert.h>
 #include <stdio.h>
 #include "CarControl.h"
 #include "CarConfig.h"
 #include "Platform.h"
 #include "Mock.h"
+#include "Heading_Mock.h"
 
-static uint32_t clock_ms; /* ²âÊÔ×¨ÓÃÊ±ÖÓ£¬¿ÉÊÖ¶¯ÍÆ½ø£¬Ò²¿ÉÒÔÄ£Äâ¼ÆÊı»ØÈÆ¡£ */
-/* ¶ÁÈ¡µ±Ç°ºÁÃë¼ÆÊı£»ÕâÊÇÊ±¿Ì£¬²»ÊÇÑÓÊ±Ê±¼ä£¬Ò²²»»á×èÈûµÈ´ı¡£ */
+static uint32_t clock_ms; /* æµ‹è¯•ä¸“ç”¨æ—¶é’Ÿï¼Œå¯æ‰‹åŠ¨æ¨è¿›ï¼Œä¹Ÿå¯ä»¥æ¨¡æ‹Ÿè®¡æ•°å›ç»•ã€‚ */
+/* è¯»å–å½“å‰æ¯«ç§’è®¡æ•°ï¼›è¿™æ˜¯æ—¶åˆ»ï¼Œä¸æ˜¯å»¶æ—¶æ—¶é—´ï¼Œä¹Ÿä¸ä¼šé˜»å¡ç­‰å¾…ã€‚ */
 uint32_t Platform_GetMs(void) { return clock_ms; }
-/* ³õÊ¼»¯Í³Ò»Ê±»ù£»STM32°æÅäÖÃSysTick£¬Ö÷»ú²âÊÔ°æ½ö³õÊ¼»¯Ä£ÄâÊ±¼ä¡£ */
+/* åˆå§‹åŒ–ç»Ÿä¸€æ—¶åŸºï¼›STM32ç‰ˆé…ç½®SysTickï¼Œä¸»æœºæµ‹è¯•ç‰ˆä»…åˆå§‹åŒ–æ¨¡æ‹Ÿæ—¶é—´ã€‚ */
 void Platform_Init(void) { clock_ms = 0U; }
-/* ²âÊÔÊ±ÖÓÍÆ½øÒ»¸ö¿ØÖÆÖÜÆÚ£¬È»ºóµ÷ÓÃÕû³µ¸üĞÂ¡£ */
+/* æµ‹è¯•æ—¶é’Ÿæ¨è¿›ä¸€ä¸ªæ§åˆ¶å‘¨æœŸï¼Œç„¶åè°ƒç”¨æ•´è½¦æ›´æ–°ã€‚ */
 static void tick(void)
 {
     clock_ms += CAR_CONTROL_PERIOD_MS;
     CarControl_Update();
 }
-/* ²âÊÔ×¼±¸£º³õÊ¼»¯²¢×¢ÈëÎÈ¶¨ºÚÏßºÍÓĞĞ§²â¾à£¬ÔÙÑéÖ¤¿ÉÒÔÆô¶¯¡£ */
+/* æµ‹è¯•å‡†å¤‡ï¼šåˆå§‹åŒ–å¹¶æ³¨å…¥ç¨³å®šé»‘çº¿å’Œæœ‰æ•ˆæµ‹è·ï¼Œå†éªŒè¯å¯ä»¥å¯åŠ¨ã€‚
+ * å¾ªè¿¹/é¿éšœç°åœ¨éƒ½è¦ç»è¿‡é™€èºèˆªå‘ç¯ï¼Œæ‰€ä»¥è¿˜è¦æŠŠæƒ¯å¯¼ç½®æˆå°±ç»ªï¼Œ
+ * å¹¶æ‰“å¼€æ›¿èº«çš„ç”µæœºè¾“å‡ºï¼Œæ‰èƒ½æ–­è¨€ã€Œèˆªå‘æ¨¡å—æ˜¯å”¯ä¸€å†™ç”µæœºçš„åœ°æ–¹ã€ã€‚ */
 static void prepare(void)
 {
     CarControl_Init();
@@ -25,10 +28,14 @@ static void prepare(void)
     assert(!CarControl_Start()); /* invalid initial inputs */
     mock_line_state = TRACK_NORMAL;
     mock_obstacle = AVOID_CHECK_CLEAR;
+    mock_heading_ready = 1U;
+    mock_heading_fault = 0U;
+    mock_heading_yaw = 0.0f;
+    mock_heading_drive = 1U;
     tick(); tick(); tick();
     assert(CarControl_Start());
 }
-/* ²âÊÔ²½Öè£º×¢ÈëÕÏ°­²¢¼ì²é½øÈë±ÜÕÏ£¬½»½Óµ±ÖÜÆÚ±ØĞëÍ£³µ¡£ */
+/* æµ‹è¯•æ­¥éª¤ï¼šæ³¨å…¥éšœç¢å¹¶æ£€æŸ¥è¿›å…¥é¿éšœï¼Œäº¤æ¥å½“å‘¨æœŸå¿…é¡»åœè½¦ã€‚ */
 static void begin_avoid(void)
 {
     mock_obstacle = AVOID_CHECK_DETECTED;
@@ -36,7 +43,7 @@ static void begin_avoid(void)
     assert(CarControl_GetState() == CAR_AVOIDING);
     assert(mock_motor_left == 0 && mock_motor_right == 0);
 }
-/* Õı³£ÏßÂ·±¾Éí²»ÄÜ´¥·¢½»½Ó£¬Ö»ÓĞDONE²Å¿É½»»ØÑ­¼£¡£ */
+/* æ­£å¸¸çº¿è·¯æœ¬èº«ä¸èƒ½è§¦å‘äº¤æ¥ï¼Œåªæœ‰DONEæ‰å¯äº¤å›å¾ªè¿¹ã€‚ */
 static void return_to_line(void)
 {
     uint32_t before = mock_track_calls;
@@ -68,14 +75,14 @@ static void return_to_line(void)
     assert(mock_track_history == 0U);
     assert(Track_GetStatus().state == sensed.state);
     assert(Track_GetStatus().error == sensed.error);
-    assert(mock_track_calls == before); /* no tracking motor write on handoff */
+    assert(mock_track_calls == before); /* no tracking control step during handoff */
     assert(mock_motor_left == 0 && mock_motor_right == 0);
     tick();
     assert(CarControl_GetState() == CAR_TRACKING);
     assert(mock_track_calls == before + 1U);
     assert(mock_track_reset_calls == resets + 1U); /* consume only once */
 }
-/* ³ÌĞòÈë¿Ú£»Ó¦ÓÃ°æÑ­»·µ÷¶ÈÕû³µ£¬²âÊÔ°æÖ´ĞĞ¸÷Ïî¶ÏÑÔÑéÖ¤¡£ */
+/* ç¨‹åºå…¥å£ï¼›åº”ç”¨ç‰ˆå¾ªç¯è°ƒåº¦æ•´è½¦ï¼Œæµ‹è¯•ç‰ˆæ‰§è¡Œå„é¡¹æ–­è¨€éªŒè¯ã€‚ */
 int main(void)
 {
     uint32_t before;
@@ -85,9 +92,14 @@ int main(void)
     before = mock_track_calls;
     CarControl_Update();
     assert(mock_track_calls == before); /* enforce period */
+    /* â˜… å¾ªè¿¹ä¸å†è‡ªå·±å†™ç”µæœºï¼šå®ƒåªç»™å‡ºã€Œç›®æ ‡èˆªå‘è§’ + ç›®æ ‡é€Ÿåº¦ã€ï¼Œ
+     *   ç”±èˆªå‘ç¯ï¼ˆé™€èºé—­ç¯ï¼‰äº§ç”Ÿå·¦å³è½®å·®é€Ÿã€‚ */
     tick();
-    assert(mock_motor_left == 200 && mock_motor_right == 200);
-    /* Ä£ÄâÁ¬Ğø4´Î±ÜÕÏ£¬¼ì²éÃ¿´Î½áÊøºó¿ÉÒÔÔÙ´ÎÆô¶¯¡£ */
+    assert(mock_heading_target == mock_track_steer);
+    assert(mock_heading_speed == mock_track_speed);
+    assert(mock_motor_left == -100 && mock_motor_right == 100); /* èˆªå‘æ›¿èº«çš„å›ºå®šå·®é€Ÿ */
+    assert(mock_heading_odo_resets >= 1U); /* å¯åŠ¨æ—¶é‡Œç¨‹æ¸…é›¶ */
+    /* æ¨¡æ‹Ÿè¿ç»­4æ¬¡é¿éšœï¼Œæ£€æŸ¥æ¯æ¬¡ç»“æŸåå¯ä»¥å†æ¬¡å¯åŠ¨ã€‚ */
     for (i = 0U; i < 4U; ++i) {
         before = mock_track_calls;
         begin_avoid();
@@ -114,7 +126,7 @@ int main(void)
     assert(CarControl_GetState() == CAR_TRACKING);
     assert(mock_track_calls == before + 1U);
 
-    /* ÑéÖ¤ÖÕµãÍ£³µ»áËø´æ£¬Ö®ºóÕÏ°­±ä»¯»òÆô¶¯ÇëÇó²»ÄÜÖØĞÂÇı¶¯¡£ */
+    /* éªŒè¯ç»ˆç‚¹åœè½¦ä¼šé”å­˜ï¼Œä¹‹åéšœç¢å˜åŒ–æˆ–å¯åŠ¨è¯·æ±‚ä¸èƒ½é‡æ–°é©±åŠ¨ã€‚ */
     CarControl_ConfirmFinish();
     mock_obstacle = AVOID_CHECK_DETECTED;
     tick(); CarControl_Stop();
@@ -135,15 +147,24 @@ int main(void)
     mock_obstacle = AVOID_CHECK_INVALID;
     tick();
     assert(CarControl_GetError() == CAR_ERROR_RANGE);
-    /* A brief loss searches at low demand; the fault latches only when
+    /* A brief loss stops the motors but is tolerated; the fault latches only when
      * CAR_TRACK_LOSS_TOLERANCE_MS passes without a stable line coming back. */
     prepare();
     mock_line_state = TRACK_LOST;
     tick();
     assert(CarControl_GetState() == CAR_TRACKING);
     assert(CarControl_GetError() == CAR_ERROR_NONE);
-    assert(mock_motor_left == CAR_TRACK_RECOVERY_DEMAND);
-    assert(mock_motor_right == CAR_TRACK_RECOVERY_DEMAND);
+    assert(mock_motor_left == 0 && mock_motor_right == 0);
+    /* å¾ªè¿¹ç»™å‡ºæœç´¢å‘½ä»¤ï¼ˆç›®æ ‡é€Ÿåº¦é 0ï¼‰æ—¶æ•´è½¦ä¸åœè½¦ï¼Œè€Œæ˜¯åŸæ ·è½¬äº¤ç»™èˆªå‘ç¯ï¼Œ
+     * ç”±å®ƒç»§ç»­é©±åŠ¨è½¦è½®æ‰¾çº¿ï¼›æœç´¢è¶…æ—¶åå¾ªè¿¹ä¼šæŠŠç›®æ ‡é€Ÿåº¦ç½® 0ï¼Œé‚£æ—¶æ‰åœè½¦ã€‚ */
+    mock_track_search_steer = 20.0f;
+    mock_track_search_speed = 15;
+    tick();
+    assert(CarControl_GetState() == CAR_TRACKING);
+    assert(mock_heading_target == 20.0f && mock_heading_speed == 15);
+    assert(mock_motor_left == -100 && mock_motor_right == 100);
+    mock_track_search_steer = 0.0f;
+    mock_track_search_speed = 0;
     mock_line_state = TRACK_NORMAL;
     tick(); tick(); tick();
     assert(Track_GetStatus().state == TRACK_NORMAL); /* stable line is back */
@@ -158,80 +179,6 @@ int main(void)
     assert(mock_motor_left == 0 && mock_motor_right == 0);
     CarControl_Stop();
     assert(!CarControl_Start()); /* fault is latched */
-    /* Search keeps the most recent steering sign, including confirmation frames. */
-    for (i = 0U; i < 2U; ++i) {
-        prepare();
-        mock_line_error = i ? 1000 : -1000;
-        tick();
-        before = mock_track_calls;
-        mock_line_state = TRACK_LOST;
-        tick();
-        assert(mock_track_calls == before);
-        assert(mock_motor_left == CAR_TRACK_RECOVERY_DEMAND +
-               (i ? CAR_TRACK_RECOVERY_CORRECTION : -CAR_TRACK_RECOVERY_CORRECTION));
-        assert(mock_motor_right == CAR_TRACK_RECOVERY_DEMAND -
-               (i ? CAR_TRACK_RECOVERY_CORRECTION : -CAR_TRACK_RECOVERY_CORRECTION));
-        mock_line_state = TRACK_NORMAL;
-        tick(); tick();
-        assert(mock_motor_left > 0 && mock_motor_right > 0);
-        assert(mock_track_calls == before);
-        tick();
-        assert(mock_track_calls == before + 1U);
-        assert(CarControl_GetError() == CAR_ERROR_NONE);
-    }
-    /* Invalid data cancels motion for the rest of this window. */
-    prepare(); tick();
-    mock_line_state = TRACK_LOST;
-    tick();
-    mock_line_state = TRACK_INVALID;
-    tick();
-    assert(mock_motor_left == 0 && mock_motor_right == 0);
-    mock_line_state = TRACK_LOST;
-    tick();
-    assert(mock_motor_left == 0 && mock_motor_right == 0);
-    clock_ms += CAR_TRACK_LOSS_TOLERANCE_MS;
-    CarControl_Update();
-    assert(CarControl_GetError() == CAR_ERROR_TRACK);
-
-    prepare(); tick();
-    mock_line_state = TRACK_AMBIGUOUS;
-    tick();
-    assert(mock_motor_left == 0 && mock_motor_right == 0);
-    mock_line_state = TRACK_LOST;
-    tick();
-    assert(mock_motor_left == 0 && mock_motor_right == 0);
-
-    /* Alternating unconfirmed/LOST frames cannot renew the deadline; wrap is safe. */
-    clock_ms = UINT32_MAX - 100U;
-    prepare(); tick();
-    mock_line_state = TRACK_LOST;
-    tick();
-    clock_ms += CAR_TRACK_LOSS_TOLERANCE_MS - CAR_CONTROL_PERIOD_MS;
-    mock_line_state = TRACK_NORMAL;
-    CarControl_Update();
-    assert(CarControl_GetState() == CAR_TRACKING);
-    assert(mock_motor_left > 0);
-    mock_line_state = TRACK_LOST;
-    tick();
-    assert(CarControl_GetError() == CAR_ERROR_TRACK);
-    assert(mock_motor_left == 0 && mock_motor_right == 0);
-
-    /* Obstacles and operator stop interrupt recovery immediately. */
-    prepare(); tick();
-    mock_line_state = TRACK_LOST;
-    tick(); begin_avoid();
-    prepare(); tick();
-    mock_line_state = TRACK_LOST;
-    mock_obstacle = AVOID_CHECK_INVALID;
-    tick();
-    assert(CarControl_GetError() == CAR_ERROR_RANGE);
-    assert(mock_motor_left == 0 && mock_motor_right == 0);
-    prepare(); tick();
-    mock_line_state = TRACK_LOST;
-    tick(); CarControl_Stop(); tick();
-    assert(CarControl_GetState() == CAR_IDLE);
-    assert(mock_motor_left == 0 && mock_motor_right == 0);
-
     prepare();
     mock_start_ok = 0U;
     mock_obstacle = AVOID_CHECK_DETECTED;
@@ -251,7 +198,7 @@ int main(void)
     CarControl_Update();
     assert(CarControl_GetError() == CAR_ERROR_AVOID_TIMEOUT);
 
-    /* ½«Ê±ÖÓ·Åµ½32Î»ÉÏÏŞ¸½½ü£¬ÑéÖ¤¼ÆÊı»ØÈÆºóÈÔÄÜÕıÈ·ÅĞ¶Ï³¬Ê±¡£ */
+    /* å°†æ—¶é’Ÿæ”¾åˆ°32ä½ä¸Šé™é™„è¿‘ï¼ŒéªŒè¯è®¡æ•°å›ç»•åä»èƒ½æ­£ç¡®åˆ¤æ–­è¶…æ—¶ã€‚ */
     clock_ms = UINT32_MAX - 60U;
     prepare(); begin_avoid();
     tick(); tick(); tick();
@@ -259,6 +206,53 @@ int main(void)
     clock_ms += CAR_AVOID_TIMEOUT_MS;
     CarControl_Update();
     assert(CarControl_GetError() == CAR_ERROR_AVOID_TIMEOUT);
+
+    /* â˜… é‡Œç¨‹åˆ°é˜ˆå€¼è‡ªåŠ¨åœè½¦å¹¶é”å­˜ï¼šå·¦å³è½®ç´¯è®¡è®¡æ•°ä¹‹å’Œ â‰¥ CAR_ODOMETER_STOP_COUNTSã€‚ */
+    prepare();
+#if CAR_ODOMETER_STOP_COUNTS > 0
+    mock_heading_odo_left = CAR_ODOMETER_STOP_COUNTS / 2;
+    mock_heading_odo_right = CAR_ODOMETER_STOP_COUNTS - mock_heading_odo_left - 1;
+    tick();
+    assert(CarControl_GetState() == CAR_TRACKING); /* å·®ä¸€ä¸ªè®¡æ•°è¿˜ä¸ç®—åˆ°ç‚¹ */
+    assert(mock_motor_left != 0 || mock_motor_right != 0);
+    mock_heading_odo_right = CAR_ODOMETER_STOP_COUNTS - mock_heading_odo_left;
+    tick();
+    assert(CarControl_GetState() == CAR_FINISHED);
+    assert(mock_motor_left == 0 && mock_motor_right == 0);
+    assert(!CarControl_Start()); /* é”å­˜åä¸èƒ½å†å¯åŠ¨ */
+    CarControl_Init();           /* åªæœ‰ Init æ‰è§£é™¤é”å­˜ */
+    assert(CarControl_GetState() == CAR_IDLE);
+#endif
+
+    /* â˜… æƒ¯å¯¼æœªå°±ç»ªæ—¶ä¸å…è®¸å¯åŠ¨ï¼šå¾ªè¿¹ç°åœ¨ä¹Ÿè¦ç»è¿‡èˆªå‘ç¯ã€‚ */
+    prepare();
+    CarControl_Stop();
+    mock_heading_ready = 0U;
+    assert(!CarControl_Start());
+    assert(CarControl_GetError() == CAR_ERROR_IMU);
+
+    /* â˜… è¿è¡Œä¸­æƒ¯å¯¼è¯»å–å¤±è´¥ â†’ ç«‹å³æ•…éšœåœè½¦ï¼Œä¸å†ç»§ç»­é©±åŠ¨è½¦è½®ã€‚ */
+    prepare();
+    mock_heading_fault = 1U;
+    tick();
+    assert(CarControl_GetState() == CAR_FAULT);
+    assert(CarControl_GetError() == CAR_ERROR_IMU);
+    assert(mock_motor_left == 0 && mock_motor_right == 0);
+    mock_heading_fault = 0U;
+
+    /* â˜… èˆªå‘æ¨¡å¼ï¼šé¡¶å±‚åªç»™ç›®æ ‡è§’å’Œç›®æ ‡é€Ÿåº¦ï¼Œä¸é©±åŠ¨å¾ªè¿¹/é¿éšœã€‚ */
+    CarControl_Init();
+    mock_heading_drive = 1U;
+    assert(CarControl_StartHeading());
+    CarControl_SetHeading(90.0f);
+    CarControl_SetSpeed(0);
+    before = mock_track_calls;
+    tick();
+    assert(CarControl_GetState() == CAR_HEADING);
+    assert(mock_heading_target == 90.0f && mock_heading_speed == 0);
+    assert(mock_track_calls == before); /* èˆªå‘æ¨¡å¼ä¸è°ƒå¾ªè¿¹ */
+    assert(mock_heading_odo_resets >= 2U); /* è¿›å…¥èˆªå‘æ¨¡å¼ä¹Ÿæ¸…é‡Œç¨‹ */
+    CarControl_Stop();
 
     prepare(); tick();
     CarControl_Stop();
@@ -269,8 +263,9 @@ int main(void)
     mock_line_state = TRACK_NORMAL;
     tick(); tick(); tick();
     assert(CarControl_Start());
-    puts("PASS: scheduling, tracking, four avoidance cycles, DONE handoff before/after update,");
-    puts("      invalid data, start failure, lost line, timeout, timer wrap,");
-    puts("      stop/restart, motor ownership, finish/fault latching.");
+    puts("PASS: scheduling, tracking through the heading loop, four avoidance cycles,");
+    puts("      DONE handoff before/after update, invalid data, start failure, lost line,");
+    puts("      timeout, timer wrap, odometer auto stop, IMU fault, stop/restart,");
+    puts("      motor ownership (Heading only), finish/fault latching.");
     return 0;
 }

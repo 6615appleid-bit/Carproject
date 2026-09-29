@@ -439,6 +439,21 @@
               <FileType>5</FileType>
               <FilePath>..\Modules\Ultrasound.h</FilePath>
             </File>
+            <File>
+              <FileName>Encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Drivers\Encoder.h</FilePath>
+            </File>
+            <File>
+              <FileName>Imu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Drivers\Imu.h</FilePath>
+            </File>
+            <File>
+              <FileName>Heading.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Drivers\Heading.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -463,6 +478,21 @@
               <FileName>Motor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Hardware\Motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>Imu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Imu.c</FilePath>
+            </File>
+            <File>
+              <FileName>Heading.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Heading.c</FilePath>
             </File>
           </Files>
         </Group>

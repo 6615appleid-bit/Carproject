@@ -1,5 +1,5 @@
-/* ÎÄ¼şÓÃÍ¾£ºI2CÍ¨ĞÅ£¬µ×²ãº¯ÊıÊµÏÖ¡£
- * Ô­³§¿âÎÄ¼ş£º¹©Çı¶¯²ãµ÷ÓÃ£¬Í¨³£ÎŞĞèÎªCarControlĞŞ¸Ä£»±£ÁôÒÔÏÂÔ­³§ËµÃ÷¡£
+/* æ–‡ä»¶ç”¨é€”ï¼šI2Cé€šä¿¡ï¼Œåº•å±‚å‡½æ•°å®ç°ã€‚
+ * åŸå‚åº“æ–‡ä»¶ï¼šä¾›é©±åŠ¨å±‚è°ƒç”¨ï¼Œé€šå¸¸æ— éœ€ä¸ºCarControlä¿®æ”¹ï¼›ä¿ç•™ä»¥ä¸‹åŸå‚è¯´æ˜ã€‚
  */
 /**
   ******************************************************************************
@@ -1277,7 +1277,7 @@ ITStatus I2C_GetITStatus(I2C_TypeDef* I2Cx, uint32_t I2C_IT)
 }
 
 /**
-  * @brief  Clears the I2Cx’s interrupt pending bits.
+  * @brief  Clears the I2CxæŠ¯ interrupt pending bits.
   * @param  I2Cx: where x can be 1 or 2 to select the I2C peripheral.
   * @param  I2C_IT: specifies the interrupt pending bit to clear. 
   *   This parameter can be any combination of the following values:

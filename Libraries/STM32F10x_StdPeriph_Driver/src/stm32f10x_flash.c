@@ -1,5 +1,5 @@
-/* ÎÄ¼şÓÃÍ¾£ºÆ¬ÄÚFlash·ÃÎÊ£¬µ×²ãº¯ÊıÊµÏÖ¡£
- * Ô­³§¿âÎÄ¼ş£º¹©Çı¶¯²ãµ÷ÓÃ£¬Í¨³£ÎŞĞèÎªCarControlĞŞ¸Ä£»±£ÁôÒÔÏÂÔ­³§ËµÃ÷¡£
+/* æ–‡ä»¶ç”¨é€”ï¼šç‰‡å†…Flashè®¿é—®ï¼Œåº•å±‚å‡½æ•°å®ç°ã€‚
+ * åŸå‚åº“æ–‡ä»¶ï¼šä¾›é©±åŠ¨å±‚è°ƒç”¨ï¼Œé€šå¸¸æ— éœ€ä¸ºCarControlä¿®æ”¹ï¼›ä¿ç•™ä»¥ä¸‹åŸå‚è¯´æ˜ã€‚
  */
 /**
   ******************************************************************************
@@ -1434,8 +1434,8 @@ FlagStatus FLASH_GetFlagStatus(uint32_t FLASH_FLAG)
 /**
   * @brief  Clears the FLASH's pending flags.
   * @note   This function can be used for all STM32F10x devices.
-  *         - For STM32F10X_XL devices, this function clears Bank1 or Bank2’s pending flags
-  *         - For other devices, it clears Bank1’s pending flags.
+  *         - For STM32F10X_XL devices, this function clears Bank1 or Bank2æŠ¯ pending flags
+  *         - For other devices, it clears Bank1æŠ¯ pending flags.
   * @param  FLASH_FLAG: specifies the FLASH flags to clear.
   *   This parameter can be any combination of the following values:         
   *     @arg FLASH_FLAG_PGERR: FLASH Program error flag       

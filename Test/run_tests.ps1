@@ -6,7 +6,7 @@ $buildDir = Join-Path $projectRoot 'Build'
 New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
 Push-Location $projectRoot
 try {
-    & gcc -std=c99 -Wall -Wextra -Werror -pedantic -IApp -IModules -IDrivers -IPlatform -ITest App/CarControl.c Test/Track_Mock.c Test/Avoid_Mock.c Test/Motor_Mock.c Test/test_car_control.c -o Build/test_car_control.exe
+    & gcc -std=c99 -Wall -Wextra -Werror -pedantic -IApp -IModules -IDrivers -IPlatform -ITest App/CarControl.c Test/Track_Mock.c Test/Avoid_Mock.c Test/Motor_Mock.c Test/Heading_Mock.c Test/test_car_control.c -o Build/test_car_control.exe
     if ($LASTEXITCODE -ne 0) { throw 'Host test compilation failed.' }
     & ./Build/test_car_control.exe
     if ($LASTEXITCODE -ne 0) { throw 'State-machine tests failed.' }

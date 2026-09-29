@@ -1,5 +1,5 @@
-/* ÎÄ¼şÓÃÍ¾£º´®¿ÚÍ¨ĞÅ£¬µ×²ãº¯ÊıÊµÏÖ¡£
- * Ô­³§¿âÎÄ¼ş£º¹©Çı¶¯²ãµ÷ÓÃ£¬Í¨³£ÎŞĞèÎªCarControlĞŞ¸Ä£»±£ÁôÒÔÏÂÔ­³§ËµÃ÷¡£
+/* æ–‡ä»¶ç”¨é€”ï¼šä¸²å£é€šä¿¡ï¼Œåº•å±‚å‡½æ•°å®ç°ã€‚
+ * åŸå‚åº“æ–‡ä»¶ï¼šä¾›é©±åŠ¨å±‚è°ƒç”¨ï¼Œé€šå¸¸æ— éœ€ä¸ºCarControlä¿®æ”¹ï¼›ä¿ç•™ä»¥ä¸‹åŸå‚è¯´æ˜ã€‚
  */
 /**
   ******************************************************************************
@@ -434,7 +434,7 @@ void USART_ITConfig(USART_TypeDef* USARTx, uint16_t USART_IT, FunctionalState Ne
 }
 
 /**
-  * @brief  Enables or disables the USART’s DMA interface.
+  * @brief  Enables or disables the USARTæŠ¯ DMA interface.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
@@ -558,7 +558,7 @@ void USART_LINBreakDetectLengthConfig(USART_TypeDef* USARTx, uint16_t USART_LINB
 }
 
 /**
-  * @brief  Enables or disables the USART’s LIN mode.
+  * @brief  Enables or disables the USARTæŠ¯ LIN mode.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
@@ -673,7 +673,7 @@ void USART_SetPrescaler(USART_TypeDef* USARTx, uint8_t USART_Prescaler)
 }
 
 /**
-  * @brief  Enables or disables the USART’s Smart Card mode.
+  * @brief  Enables or disables the USARTæŠ¯ Smart Card mode.
   * @param  USARTx: where x can be 1, 2 or 3 to select the USART peripheral.
   * @param  NewState: new state of the Smart Card mode.
   *   This parameter can be: ENABLE or DISABLE.     
@@ -723,7 +723,7 @@ void USART_SmartCardNACKCmd(USART_TypeDef* USARTx, FunctionalState NewState)
 }
 
 /**
-  * @brief  Enables or disables the USART’s Half Duplex communication.
+  * @brief  Enables or disables the USARTæŠ¯ Half Duplex communication.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
